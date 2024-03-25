@@ -154,7 +154,8 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address)
 
 	if(ina219_isReady == HAL_OK)
 	{
-
+		ina219->states.is_on_bus = 1;
+		ina219->states.old_stat = 1;
 		INA219_Reset(ina219);
 		INA219_setCalibration_32V_2A(ina219);
 
@@ -163,6 +164,51 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address)
 
 	else
 	{
+		ina219->states.is_on_bus = 0;
+		ina219->states.old_stat = 0;
+		return 0;
+	}
+}
+
+void INA219_isOnBus(INA219_t *ina219)
+{
+
+	uint8_t ina219_isReady = HAL_I2C_IsDeviceReady(ina219->ina219_i2c, (ina219->Address << 1), 3, 2);
+
+	if (ina219_isReady == HAL_OK)
+	{
+		ina219->states.is_on_bus = 1;
+	}
+
+	else
+	{
+		ina219->states.is_on_bus = 0;
+	}
+}
+
+uint8_t INA219_ReInit(INA219_t *ina219)
+{
+	printf("\r\nreinit function\r\n");
+
+	ina219_currentDivider_mA = 0;
+	ina219_powerMultiplier_mW = 0;
+
+	uint8_t ina219_isReady = HAL_I2C_IsDeviceReady(ina219->ina219_i2c, (ina219->Address << 1), 3, 2);
+
+	if (ina219_isReady == HAL_OK)
+	{
+		INA219_Reset(ina219);
+		INA219_setCalibration_16V_400mA(ina219);
+		ina219->states.is_on_bus = 1;
+		ina219->states.old_stat = 1;
+
+		return 1;
+	}
+
+	else
+	{
+		ina219->states.is_on_bus = 0;
+		ina219->states.old_stat = 0;
 		return 0;
 	}
 }

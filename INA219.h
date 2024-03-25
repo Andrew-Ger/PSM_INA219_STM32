@@ -61,11 +61,12 @@ typedef struct
 {
 	I2C_HandleTypeDef 	*ina219_i2c;
 	uint8_t				Address;
-	struct states
+	struct
 	{
 		uint8_t is_on_bus : 1;
 		uint8_t is_active : 1;
-	};
+		uint8_t old_stat : 1;
+	} states;
 
 } INA219_t;
 
@@ -87,6 +88,8 @@ void INA219_setCalibration_32V_2A(INA219_t *ina219);
 void INA219_setCalibration_32V_1A(INA219_t *ina219);
 void INA219_setCalibration_16V_400mA(INA219_t *ina219);
 void INA219_setPowerMode(INA219_t *ina219, uint8_t Mode);
+void INA219_isOnBus(INA219_t *ina219);
+uint8_t INA219_ReInit(INA219_t *ina219);
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register);
 void Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
