@@ -1,10 +1,3 @@
-/*
- * INA219.h
- *
- *  Created on: Dec 30, 2020
- *      Author: Piotr Smolen <komuch@gmail.com>
- */
-
 #ifndef INC_INA219_H_
 #define INC_INA219_H_
 
@@ -68,6 +61,12 @@ typedef struct
 {
 	I2C_HandleTypeDef 	*ina219_i2c;
 	uint8_t				Address;
+	struct states
+	{
+		uint8_t is_on_bus : 1;
+		uint8_t is_active : 1;
+	};
+
 } INA219_t;
 
 uint16_t ina219_calibrationValue;
