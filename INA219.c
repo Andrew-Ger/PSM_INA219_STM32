@@ -31,7 +31,7 @@ int16_t INA219_ReadCurrent_raw(INA219_t *ina219)
 {
 	int16_t result = Read16(ina219, INA219_REG_CURRENT);
 
-	return (result );
+	return result;
 }
 
 int16_t INA219_ReadCurrent(INA219_t *ina219)
@@ -103,9 +103,9 @@ void INA219_setCalibration_32V_1A(INA219_t *ina219)
 void INA219_setCalibration_16V_400mA(INA219_t *ina219)
 {
 	uint16_t config = INA219_CONFIG_BVOLTAGERANGE_16V |
-					  INA219_CONFIG_GAIN_1_40MV  |
-					  INA219_CONFIG_SADCRES_12BIT_1S_532US |
-					  INA219_CONFIG_MODE_SANDBVOLT_TRIGGERED;
+					  INA219_CONFIG_GAIN_1_40MV |
+					  INA219_CONFIG_SADCRES_12BIT_128S_69MS |
+					  INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS;
 
 	ina219_calibrationValue = 8192;
 	ina219_currentDivider_mA = 20;    // Current LSB = 50uA per bit (1000/50 = 20)
@@ -157,7 +157,7 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address)
 		ina219->states.is_on_bus = 1;
 		ina219->states.old_stat = 1;
 		INA219_Reset(ina219);
-		INA219_setCalibration_32V_2A(ina219);
+		INA219_setCalibration_16V_400mA(ina219);
 
 		return 1;
 	}
@@ -188,7 +188,7 @@ void INA219_isOnBus(INA219_t *ina219)
 
 uint8_t INA219_ReInit(INA219_t *ina219)
 {
-	printf("\r\nreinit function\r\n");
+	// printf("\r\nreinit function\r\n");
 
 	ina219_currentDivider_mA = 0;
 	ina219_powerMultiplier_mW = 0;
