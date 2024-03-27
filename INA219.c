@@ -34,11 +34,19 @@ int16_t INA219_ReadCurrent_raw(INA219_t *ina219)
 	return result;
 }
 
-int16_t INA219_ReadCurrent(INA219_t *ina219)
+float INA219_ReadCurrent(INA219_t *ina219)
 {
-	int16_t result = INA219_ReadCurrent_raw(ina219);
+	float result = INA219_ReadCurrent_raw(ina219);
+	result /= ina219_currentDivider_mA;
+	return result;
+}
+float INA219_ReadPower(INA219_t *ina219)
+{
+	int16_t result = Read16(ina219, INA219_REG_POWER);
 
-	return (result / ina219_currentDivider_mA );
+	float valueDec = result * ina219_powerMultiplier_mW;
+
+	return valueDec;
 }
 
 uint16_t INA219_ReadShuntVolage(INA219_t *ina219)
@@ -104,12 +112,13 @@ void INA219_setCalibration_16V_400mA(INA219_t *ina219)
 {
 	uint16_t config = INA219_CONFIG_BVOLTAGERANGE_16V |
 					  INA219_CONFIG_GAIN_1_40MV |
+					  INA219_CONFIG_SADCRES_12BIT_128S_69MS|
 					  INA219_CONFIG_SADCRES_12BIT_128S_69MS |
 					  INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS;
 
-	ina219_calibrationValue = 8192;
-	ina219_currentDivider_mA = 20;    // Current LSB = 50uA per bit (1000/50 = 20)
-	ina219_powerMultiplier_mW = 1.0f; // Power LSB = 1mW per bit
+	ina219_calibrationValue = 27768;//27306
+	ina219_currentDivider_mA = 64;    // Current LSB = 50uA per bit (1000/50 = 20)//64 my setting
+	ina219_powerMultiplier_mW = 0.4f; // Power LSB = 1mW per bit
 
 	INA219_setCalibration(ina219, ina219_calibrationValue);
 	INA219_setConfig(ina219, config);

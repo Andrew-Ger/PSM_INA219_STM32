@@ -76,9 +76,10 @@ int16_t ina219_powerMultiplier_mW;
 
 uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address);
 uint16_t INA219_ReadBusVoltage(INA219_t *ina219);
-int16_t INA219_ReadCurrent(INA219_t *ina219);
+float INA219_ReadCurrent(INA219_t *ina219);
 int16_t INA219_ReadCurrent_raw(INA219_t *ina219);
 uint16_t INA219_ReadShuntVolage(INA219_t *ina219);
+float INA219_ReadPower(INA219_t *ina219);
 
 void INA219_Reset(INA219_t *ina219);
 void INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
