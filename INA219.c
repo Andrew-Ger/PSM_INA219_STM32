@@ -1,11 +1,36 @@
 #include "main.h"
 #include "INA219.h"
+#include <FreeRTOS.h>
+#include "task.h"
+#include "cmsis_os2.h"
+#include "i2c.h"
+
+static osMutexId_t i2c1_mut_id = NULL;
+static osMutexId_t i2c2_mut_id = NULL;
+const osMutexAttr_t i2c1_mutex_attr = {"i2c1Mutex", osMutexPrioInherit, NULL, 0};
+const osMutexAttr_t i2c2_mutex_attr = {"i2c2Mutex", osMutexPrioInherit, NULL, 0};
+
+void initI2cMutex()
+{
+	i2c1_mut_id = osMutexNew(&i2c1_mutex_attr);
+	i2c2_mut_id = osMutexNew(&i2c1_mutex_attr);
+}
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register)
 {
+
 	uint8_t Value[2];
 
-	HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address<<1), Register, 1, Value, 2, 1000);
+if(ina219->ina219_i2c == &hi2c1){
+	osMutexAcquire(i2c1_mut_id, osWaitForever);
+	HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, Value, 2, 1000);
+	osMutexRelease(i2c1_mut_id);
+	}
+	else{
+	osMutexAcquire(i2c2_mut_id, osWaitForever);
+	HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, Value, 2, 1000);
+	osMutexRelease(i2c2_mut_id);
+	}
 
 	return ((Value[0] << 8) | Value[1]);
 }
@@ -15,7 +40,18 @@ HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value)
 	uint8_t addr[2];
 	addr[0] = (Value >> 8) & 0xff;  // upper byte
 	addr[1] = (Value >> 0) & 0xff; // lower byte
+
+	if(ina219->ina219_i2c == &hi2c1){
+	osMutexAcquire(i2c1_mut_id, osWaitForever);
 	return HAL_I2C_Mem_Write(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, (uint8_t *)addr, 2, 1000);
+	osMutexRelease(i2c1_mut_id);
+	}
+	else{
+	osMutexAcquire(i2c2_mut_id, osWaitForever);
+	return HAL_I2C_Mem_Write(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, (uint8_t *)addr, 2, 1000);
+	osMutexRelease(i2c2_mut_id);
+	}
+
 }
 
 uint16_t INA219_ReadBusVoltage(INA219_t *ina219)
@@ -58,7 +94,6 @@ uint16_t INA219_ReadShuntVolage(INA219_t *ina219)
 void INA219_Reset(INA219_t *ina219)
 {
 	Write16(ina219, INA219_REG_CONFIG, INA219_CONFIG_RESET);
-	HAL_Delay(1);
 }
 
 HAL_StatusTypeDef INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData)

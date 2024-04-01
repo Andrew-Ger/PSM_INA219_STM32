@@ -94,5 +94,5 @@ uint8_t INA219_ReInit(INA219_t *ina219);
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register);
 HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
-
+void initI2cMutex();
 #endif /* INC_INA219_H_ */
