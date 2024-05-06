@@ -63,10 +63,13 @@ typedef struct
 	uint8_t				Address;
 	struct
 	{
-		uint8_t is_on_bus : 1;
-		uint8_t is_active : 1;
-		uint8_t old_stat : 1;
-	} states;
+        uint8_t is_on_bus : 1;
+        uint8_t is_inited : 1;
+        uint8_t old_stat  : 1;
+        uint8_t target    : 4;
+        uint8_t reserved  : 1;
+
+    } states;
 
 } INA219_t;
 

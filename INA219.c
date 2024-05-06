@@ -201,8 +201,8 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address)
 		{
 			ina219->states.is_on_bus = 1;
 			ina219->states.old_stat = 1;
-			return 1;
-		}
+            return 1;
+        }
 		return 0;
 	}
 
