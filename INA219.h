@@ -63,10 +63,13 @@ typedef struct
 	uint8_t				Address;
 	struct
 	{
-		uint8_t is_on_bus : 1;
-		uint8_t is_active : 1;
-		uint8_t old_stat : 1;
-	} states;
+        uint8_t is_on_bus : 1;
+        uint8_t is_inited : 1;
+        uint8_t old_stat  : 1;
+        uint8_t target    : 4;
+        uint8_t reserved  : 1;
+
+    } states;
 
 } INA219_t;
 
@@ -76,24 +79,23 @@ int16_t ina219_powerMultiplier_mW;
 
 uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address);
 uint16_t INA219_ReadBusVoltage(INA219_t *ina219);
-int16_t INA219_ReadCurrent(INA219_t *ina219);
+float INA219_ReadCurrent(INA219_t *ina219);
 int16_t INA219_ReadCurrent_raw(INA219_t *ina219);
 uint16_t INA219_ReadShuntVolage(INA219_t *ina219);
+float INA219_ReadPower(INA219_t *ina219);
 
 void INA219_Reset(INA219_t *ina219);
-void INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
+HAL_StatusTypeDef INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
 uint16_t INA219_getConfig(INA219_t *ina219);
-void INA219_setConfig(INA219_t *ina219, uint16_t Config);
+HAL_StatusTypeDef INA219_setConfig(INA219_t *ina219, uint16_t Config);
 void INA219_setCalibration_32V_2A(INA219_t *ina219);
 void INA219_setCalibration_32V_1A(INA219_t *ina219);
-void INA219_setCalibration_16V_400mA(INA219_t *ina219);
+HAL_StatusTypeDef INA219_setCalibration_16V_400mA(INA219_t *ina219);
 void INA219_setPowerMode(INA219_t *ina219, uint8_t Mode);
 void INA219_isOnBus(INA219_t *ina219);
 uint8_t INA219_ReInit(INA219_t *ina219);
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register);
-void Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
-
-
-
+HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
+void initI2cMutex();
 #endif /* INC_INA219_H_ */
