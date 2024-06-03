@@ -7,13 +7,13 @@
 
 static osMutexId_t i2c1_mut_id = NULL;
 static osMutexId_t i2c2_mut_id = NULL;
-const osMutexAttr_t i2c1_mutex_attr = {"i2c1Mutex", osMutexPrioInherit, NULL, 0};
-const osMutexAttr_t i2c2_mutex_attr = {"i2c2Mutex", osMutexPrioInherit, NULL, 0};
+const osMutexAttr_t i2c1_mutex_attr = {"i2c1Mutex", osMutexPrioInherit, NULL, 1};
+const osMutexAttr_t i2c2_mutex_attr = {"i2c2Mutex", osMutexPrioInherit, NULL, 1};
 
 void initI2cMutex()
 {
 	i2c1_mut_id = osMutexNew(&i2c1_mutex_attr);
-	i2c2_mut_id = osMutexNew(&i2c1_mutex_attr);
+	i2c2_mut_id = osMutexNew(&i2c2_mutex_attr);
 }
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register)
@@ -127,7 +127,7 @@ void INA219_setCalibration_32V_2A(INA219_t *ina219)
 	INA219_setConfig(ina219, config);
 }
 
-void INA219_setCalibration_32V_1A(INA219_t *ina219)
+HAL_StatusTypeDef INA219_setCalibration_32V_1A(INA219_t *ina219)
 {
 	uint16_t config = INA219_CONFIG_BVOLTAGERANGE_32V |
 	                    INA219_CONFIG_GAIN_8_320MV | INA219_CONFIG_BADCRES_12BIT |
@@ -138,8 +138,9 @@ void INA219_setCalibration_32V_1A(INA219_t *ina219)
 	ina219_currentDivider_mA = 25;    // Current LSB = 40uA per bit (1000/40 = 25)
 	ina219_powerMultiplier_mW = 0.8f; // Power LSB = 800uW per bit
 
-	INA219_setCalibration(ina219, ina219_calibrationValue);
-	INA219_setConfig(ina219, config);
+	// INA219_setCalibration(ina219, ina219_calibrationValue);
+	// INA219_setConfig(ina219, config);
+	return (INA219_setCalibration(ina219, ina219_calibrationValue) && INA219_setConfig(ina219, config));
 }
 
 HAL_StatusTypeDef INA219_setCalibration_16V_400mA(INA219_t *ina219)
@@ -171,7 +172,8 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address)
 	if(ina219_isReady == HAL_OK)
 	{
 		INA219_Reset(ina219);
-		if (INA219_setCalibration_16V_400mA(ina219) == HAL_OK)
+		// if (INA219_setCalibration_16V_400mA(ina219) == HAL_OK)
+		if (INA219_setCalibration_32V_1A(ina219) == HAL_OK)
 		{
 			ina219->states.is_on_bus = 1;
 			ina219->states.old_stat = 1;

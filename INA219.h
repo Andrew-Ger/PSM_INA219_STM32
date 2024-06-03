@@ -89,7 +89,7 @@ HAL_StatusTypeDef INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationDa
 uint16_t INA219_getConfig(INA219_t *ina219);
 HAL_StatusTypeDef INA219_setConfig(INA219_t *ina219, uint16_t Config);
 void INA219_setCalibration_32V_2A(INA219_t *ina219);
-void INA219_setCalibration_32V_1A(INA219_t *ina219);
+HAL_StatusTypeDef INA219_setCalibration_32V_1A(INA219_t *ina219);
 HAL_StatusTypeDef INA219_setCalibration_16V_400mA(INA219_t *ina219);
 void INA219_isOnBus(INA219_t *ina219);
 
