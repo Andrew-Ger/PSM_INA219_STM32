@@ -1,11 +1,26 @@
 #ifndef INC_INA219_H_
 #define INC_INA219_H_
 
-#define INA219_ADDRESS 							(0x40)
+//    I2C ADDRESS TABLE
+ // | A0   | A1   | Address |
+ // | GND  | GND  | 0x40    |
+ // | GND  | V_S+ | 0x41    |
+ // | GND  | SDA  | 0x42    |
+ // | GND  | SCL  | 0x43    |
+ // | V_S+ | GND  | 0x44    |
+ // | V_S+ | V_S+ | 0x45    |
+ // | V_S+ | SDA  | 0x46    |
+ // | V_S+ | SCL  | 0x47    |
+ // | SDA  | GND  | 0x48    |
+ // | SDA  | V_S+ | 0x49    |
+ // | SDA  | SDA  | 0x4A    |
+ // | SDA  | SCL  | 0x4B    |
+ // | SCL  | GND  | 0x4C    |
+ // | SCL  | V_S+ | 0x4D    |
+ // | SCL  | SDA  | 0x4E    |
+ // | SCL  | SCL  | 0x4F    |
 
-//
 //	Registers
-//
 #define	INA219_REG_CONFIG						(0x00)
 #define	INA219_REG_SHUNTVOLTAGE					(0x01)
 #define	INA219_REG_BUSVOLTAGE					(0x02)
@@ -89,11 +104,9 @@ HAL_StatusTypeDef INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationDa
 uint16_t INA219_getConfig(INA219_t *ina219);
 HAL_StatusTypeDef INA219_setConfig(INA219_t *ina219, uint16_t Config);
 void INA219_setCalibration_32V_2A(INA219_t *ina219);
-void INA219_setCalibration_32V_1A(INA219_t *ina219);
+HAL_StatusTypeDef INA219_setCalibration_32V_1A(INA219_t *ina219);
 HAL_StatusTypeDef INA219_setCalibration_16V_400mA(INA219_t *ina219);
-void INA219_setPowerMode(INA219_t *ina219, uint8_t Mode);
 void INA219_isOnBus(INA219_t *ina219);
-uint8_t INA219_ReInit(INA219_t *ina219);
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register);
 HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
