@@ -1,11 +1,26 @@
 #ifndef INC_INA219_H_
 #define INC_INA219_H_
 
-#define INA219_ADDRESS 							(0x40)
+//    I2C ADDRESS TABLE
+ // | A0   | A1   | Address |
+ // | GND  | GND  | 0x40    |
+ // | GND  | V_S+ | 0x41    |
+ // | GND  | SDA  | 0x42    |
+ // | GND  | SCL  | 0x43    |
+ // | V_S+ | GND  | 0x44    |
+ // | V_S+ | V_S+ | 0x45    |
+ // | V_S+ | SDA  | 0x46    |
+ // | V_S+ | SCL  | 0x47    |
+ // | SDA  | GND  | 0x48    |
+ // | SDA  | V_S+ | 0x49    |
+ // | SDA  | SDA  | 0x4A    |
+ // | SDA  | SCL  | 0x4B    |
+ // | SCL  | GND  | 0x4C    |
+ // | SCL  | V_S+ | 0x4D    |
+ // | SCL  | SDA  | 0x4E    |
+ // | SCL  | SCL  | 0x4F    |
 
-//
 //	Registers
-//
 #define	INA219_REG_CONFIG						(0x00)
 #define	INA219_REG_SHUNTVOLTAGE					(0x01)
 #define	INA219_REG_BUSVOLTAGE					(0x02)
