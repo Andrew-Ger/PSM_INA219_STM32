@@ -2,7 +2,7 @@
 #define INC_INA219_H_
 
  //    I2C ADDRESS TABLE
- // | A0   | A1   | Address |
+ // | A1   | A0   | Address |
  // | GND  | GND  | 0x40    |
  // | GND  | V_S+ | 0x41    |
  // | GND  | SDA  | 0x42    |

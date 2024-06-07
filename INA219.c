@@ -88,12 +88,12 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address) {
         initStatus |= INA219_setCalibration(ina219, ina219->calib->ina219_calibrationValue);
         initStatus |= INA219_setConfig(ina219, ina219->calib->ina219_config);
         if (initStatus == HAL_OK) {
-            ina219->states.is_on_bus = 1;
+            ina219->states.is_inited = 1;
             return 1;
         }
         return 0;
     } else {
-        ina219->states.is_on_bus = 0;
+        ina219->states.is_inited = 0;
         return 0;
     }
 }
