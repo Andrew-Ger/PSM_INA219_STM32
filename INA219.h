@@ -49,32 +49,36 @@
 #define INA219_CONFIG_SADCRES_12BIT_32S_17MS   (0x0068) // 32 x 12-bit shunt samples averaged together
 #define INA219_CONFIG_SADCRES_12BIT_64S_34MS   (0x0070) // 64 x 12-bit shunt samples averaged together
 #define INA219_CONFIG_SADCRES_12BIT_128S_69MS  (0x0078) // 128 x 12-bit shunt samples averaged together
+#define	INA219_CONFIG_BADCRES_12BIT_128S_69MS	(0x0780) // 128 x 12-bit bus samples averaged together
 
 #define INA219_CONFIG_MODE_MASK                (0x07)
 #define INA219_CONFIG_MODE_POWERDOWN           (0x00) /**< power down */
 #define INA219_CONFIG_MODE_SVOLT_TRIGGERED     (0x01) /**< shunt voltage triggered */
-#define INA219_CONFIG_MODE_ADCOFF              (0x04) /**< ADC off */
-#define INA219_CONFIG_MODE_SVOLT_CONTINUOUS    (0x05) /**< shunt voltage continuous */
+#define INA219_CONFIG_MODE_ADCOFF               (0x04) /**< ADC off */
+#define INA219_CONFIG_MODE_SVOLT_CONTINUOUS     (0x05) /**< shunt voltage continuous */
+#define INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS (0x07)
 
-
-// calibrate and check koef correctly
-#define INA219_HIGH_CALIBREG                   (10240)
-#define INA219_LOW_CALIBREG                    (27768)
-#define INA219_HIGH_CURR_DIV                   (25)
-#define INA219_LOW_CURR_DIV                    (61)
+ // calibrate and check koef correctly
+#define INA219_HIGH_CALIBREG    (10240)
+#define INA219_LOW_CALIBREG     (27768)
+#define INA219_HIGH_CURR_DIV    (25)
+#define INA219_LOW_CURR_DIV     (61)
+#define INA219_POW_DIV          (0.8)
+#define INA219_SHUNT_RESISTANCE (100)
 
 #define INA219_HIGH_CONFIG                                                                                  \
-     INA219_CONFIG_BVOLTAGERANGE_32V | INA219_CONFIG_GAIN_8_320MV | INA219_CONFIG_SADCRES_12BIT_1S_532US |   \
-         INA219_CONFIG_MODE_SVOLT_CONTINUOUS
+     INA219_CONFIG_BVOLTAGERANGE_16V | INA219_CONFIG_GAIN_8_320MV | INA219_CONFIG_SADCRES_12BIT_128S_69MS |   \
+          INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS 
 
 #define INA219_LOW_CONFIG                                                                                   \
      INA219_CONFIG_BVOLTAGERANGE_16V | INA219_CONFIG_GAIN_1_40MV | INA219_CONFIG_SADCRES_12BIT_128S_69MS |   \
-         INA219_CONFIG_MODE_SVOLT_CONTINUOUS
+          INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS
 
  struct calibCoef {
      uint16_t ina219_calibrationValue;
      int16_t  ina219_currentDivider_mA;
      int16_t  ina219_config;
+     float    ina219_powerMultiplier_mW;
  };
 
  extern struct calibCoef high_calib; // 32v 1A
@@ -93,13 +97,17 @@
 
  } INA219_t;
 
- void initI2cMutex();
- void INA219_Reset(INA219_t *ina219);
- void INA219_isOnBus(INA219_t *ina219);
- float INA219_ReadCurrent(INA219_t *ina219);
- uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address);
- uint16_t Read16(INA219_t *ina219, uint8_t Register);
+ void              initI2cMutex();
+ void              INA219_Reset(INA219_t *ina219);
+ void              INA219_isOnBus(INA219_t *ina219);
+ float             INA219_ReadCurrent(INA219_t *ina219);
+ float             getPower_mW(INA219_t *ina219, float corrCoef);
+ float             INA219_ReadBusVoltage(INA219_t *ina219, float corrCoef);
+ float             INA219_MeasComp(float current);
+ uint8_t           INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address);
+ uint16_t          Read16(INA219_t *ina219, uint8_t Register);
  HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
  HAL_StatusTypeDef INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
  HAL_StatusTypeDef INA219_setConfig(INA219_t *ina219, uint16_t Config);
+
 #endif /* INC_INA219_H_ */

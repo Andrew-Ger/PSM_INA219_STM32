@@ -10,8 +10,8 @@ static osMutexId_t i2c2_mut_id = NULL;
 const osMutexAttr_t i2c1_mutex_attr = {"i2c1Mutex", osMutexPrioInherit, NULL, 1};
 const osMutexAttr_t i2c2_mutex_attr = {"i2c2Mutex", osMutexPrioInherit, NULL, 1};
 
-struct calibCoef high_calib = {INA219_HIGH_CALIBREG, INA219_HIGH_CURR_DIV, INA219_HIGH_CONFIG};
-struct calibCoef low_calib  = {INA219_LOW_CALIBREG, INA219_LOW_CURR_DIV, INA219_LOW_CONFIG};
+struct calibCoef high_calib = {INA219_HIGH_CALIBREG, INA219_HIGH_CURR_DIV, INA219_HIGH_CONFIG, INA219_POW_DIV};
+struct calibCoef low_calib  = {INA219_LOW_CALIBREG, INA219_LOW_CURR_DIV, INA219_LOW_CONFIG, INA219_POW_DIV};
 
 
 uint16_t Read16(INA219_t *ina219, uint8_t Register) {
@@ -96,4 +96,19 @@ uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address) {
         ina219->states.is_inited = 0;
         return 0;
     }
+}
+
+float getPower_mW(INA219_t *ina219, float corrCoef) {
+    float valueDec = Read16(ina219, INA219_REG_POWER);
+    valueDec *= ina219->calib->ina219_powerMultiplier_mW;
+    return valueDec + corrCoef;
+}
+
+float INA219_ReadBusVoltage(INA219_t *ina219, float corrCoef) {
+    uint16_t result = (Read16(ina219, INA219_REG_BUSVOLTAGE)>> 3) * 4;
+    return (float)result + corrCoef;
+}
+
+float INA219_MeasComp(float current) {
+    return (current * INA219_SHUNT_RESISTANCE)/1000;
 }
