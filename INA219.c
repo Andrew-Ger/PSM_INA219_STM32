@@ -5,10 +5,8 @@
 #include "cmsis_os2.h"
 #include "i2c.h"
 
-static osMutexId_t i2c1_mut_id = NULL;
-static osMutexId_t i2c2_mut_id = NULL;
+static osMutexId_t  i2c1_mut_id     = NULL;
 const osMutexAttr_t i2c1_mutex_attr = {"i2c1Mutex", osMutexPrioInherit, NULL, 1};
-const osMutexAttr_t i2c2_mutex_attr = {"i2c2Mutex", osMutexPrioInherit, NULL, 1};
 
 struct calibCoef high_calib = {INA219_HIGH_CALIBREG, INA219_HIGH_CURR_DIV, INA219_HIGH_CONFIG, INA219_POW_DIV};
 struct calibCoef low_calib  = {INA219_LOW_CALIBREG, INA219_LOW_CURR_DIV, INA219_LOW_CONFIG, INA219_POW_DIV};
@@ -20,12 +18,7 @@ uint16_t Read16(INA219_t *ina219, uint8_t Register) {
         osMutexAcquire(i2c1_mut_id, osWaitForever);
         HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, Value, 2, 1000);
         osMutexRelease(i2c1_mut_id);
-    } else {
-        osMutexAcquire(i2c2_mut_id, osWaitForever);
-        HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, Value, 2, 1000);
-        osMutexRelease(i2c2_mut_id);
     }
-
     return ((Value[0] << 8) | Value[1]);
 }
 HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value) {
@@ -38,18 +31,12 @@ HAL_StatusTypeDef Write16(INA219_t *ina219, uint8_t Register, uint16_t Value) {
         return HAL_I2C_Mem_Write(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, (uint8_t *) addr, 2,
                                  1000);
         osMutexRelease(i2c1_mut_id);
-    } else {
-        osMutexAcquire(i2c2_mut_id, osWaitForever);
-        return HAL_I2C_Mem_Write(ina219->ina219_i2c, (ina219->Address << 1), Register, 1, (uint8_t *) addr, 2,
-                                 1000);
-        osMutexRelease(i2c2_mut_id);
     }
 }
 
 void initI2cMutex()
 {
-	i2c1_mut_id = osMutexNew(&i2c1_mutex_attr);
-	i2c2_mut_id = osMutexNew(&i2c2_mutex_attr);
+    i2c1_mut_id = osMutexNew(&i2c1_mutex_attr);
 }
 void INA219_Reset(INA219_t *ina219)
 {
